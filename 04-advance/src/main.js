@@ -1,6 +1,10 @@
 import './style.css'
 import javascriptLogo from './javascript.svg'
 import viteLogo from '/vite.svg'
+import { enviromentsComponent } from './concepts/01-enviroments'
+import { callbacksComponent } from './concepts/02-callbacks'
+import { promiseComponent } from './concepts/03-promises'
+import { promiseRaceComponent } from './concepts/04-promise-race'
 
 
 document.querySelector('#app').innerHTML = `
@@ -18,6 +22,9 @@ document.querySelector('#app').innerHTML = `
     
   </div>
 `
+const element = document.querySelector('.card')
 
-console.log('Hola Mundo')
-
+// enviromentsComponent(element)
+// callbacksComponent(element)
+// promiseComponent(element)
+promiseRaceComponent(element);

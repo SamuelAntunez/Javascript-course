@@ -74,6 +74,8 @@ Son objetos muy parecidos a una lista de información, que contiene un grupo de 
 * **`arr.filter( arr => condicion)`**: crea un nuevo array con todos los elementos que cumplan la condición implementada por la función dada.
 * **`Arr.map()`**: crea un nuevo array con los resultados de la llamada a la función indicada aplicados a cada uno de sus elementos.
 * **`Arr.forEach()`**: crea un nuevo array con los resultados de la llamada a la función indicada aplicados a cada uno de sus elementos.
+* **`arr.find( hero => hero.id === id)`**: devuelve el primer elemento de un array que cumple con una condición especificada en una función de prueba (callback) 
+
 
 ***
 ### Objetos Literales
@@ -476,3 +478,242 @@ spiderman.setComidaFavorita = 'Pastel de carne' // enviar argumento
 ```
 >Los set suelen recibir un solo argumento
 
+## Variables de Entorno
+
+Son variables que dependiendo del entorno o donde se este ejecutando la aplicacion tendran un valor distinto
+
+### `dotenv`
+
+Paquete para trabajar con variables de entorno con node
+
+### trabajar con variables de entorno con vite
+
+Se trabaja creando un archivo `.env`
+
+```env
+API_KEY =EstaEsMiLLavePrivada
+BASE_URL=https://localhost:1234/cursos/samuel
+```
+
+Los archivos `.env` no se les da seguimiento, su informacion es privada
+> se suele crear un archivo `.env.template` para indicarle a los demas compañeros como deben crear sus variables
+
+En **node** las variables de entorno se guardan en `process.env`, pero en **VITE** se guardan en `import.meta.env`
+
+Para trabajar con variables de entorno en VITE necesitamos colocar la palabra reservada `VITE` en las VE
+
+```env
+VITE_API_KEY =EstaEsMiLLavePrivada
+VITE_BASE_URL=https://localhost:1234/cursos/samuel
+```
+Para llamar a la **VE** utilizamos
+```js
+import.meta.env.DEV // true
+import.meta.env.VITE_API_KEY // EstaEsMiLLavePrivada
+import.meta.env.VITE_BASE_URL // https://localhost:1234/cursos/samuel
+
+```
+>VE = Variables de Entorno
+
+## Callbacks
+
+Funcion que recibe como argumento otra funcion que se invoca
+
+```js
+export const callbacksComponent = ( element ) =>{
+    const id = '5d86371f2343e37870b91ef1';
+    findHero( id, (hero) =>{
+        element.innerHTML = hero.name
+    })
+}
+
+const findHero = ( id, callback ) =>{
+
+   const hero = heroes.find( hero => hero.id === id)
+
+   callback( hero)
+}
+```
+- Permiten ejecutar código después de que una tarea haya terminado.
+- Son fundamentales en operaciones como eventos, temporizadores, peticiones HTTP, etc.
+- Son la base de conceptos más avanzados como promesas y async/await.
+
+### Manejo de Errores en los Callbacks
+
+```js
+export const callbacksComponent = ( element ) =>{
+    const id = '5d86371f2343e37870b91ef1';
+    findHero( id, (hero) =>{
+        element.innerHTML = hero?.name || 'No hay heroe' // si no existe devuelve undefined
+    })
+}
+```
+
+Colocar el `?` en el arreglo, nos evalua si existe, en tal caso de existir nos buscara la propiedad que estamos buscando
+
+```js
+const findHero = ( id, callback ) =>{
+
+    const hero = heroes.find( hero => hero.id === id)
+    if(!hero ){
+        callback(`Hero with id ${id} not found`)
+        return;
+    }
+   callback(null, hero)
+}
+```
+
+Para manejar errores con los callbacks, ahora tomamos dos argumentos, donde el primer argumento sera un `error` y el segundo argumento, el que estamos buscando
+
+### Callback Hell
+
+```js
+export const callbacksComponent = ( element ) =>{
+    const id1 = '5d86371f2343e37870b91ef1';
+    const id2 = '5d86371f2343e37870b91ef1';
+    findHero( id1, (err, hero1) =>{
+        if (!hero1) {
+            element.innerHTML = err
+            return
+        }
+        findHero(id2, (err, hero2) =>{
+            if (!hero2) {
+            element.innerHTML = err
+            return
+            }
+            element.innerHTML = `${hero1.name} ${hero2.name}`
+
+        })
+    })
+}
+```
+Ocurre cuando encadenas múltiples funciones asincrónicas usando callbacks anidados, lo que genera un código difícil de leer, mantener y depurar.
+
+## Promises
+
+### Sintaxis Basica
+```js
+const promise = new Promise( (resolve, reject)=>{
+
+  const hero = heroes.find( hero => hero.id === id)
+  if (hero) {
+    resolve(hero)
+    return
+  }
+  reject(`hero with id ${id} not found`)
+  return promise;
+});
+```
+Dentro de la promesa tenemos una funcion, con dos argumentos, el argumento `resolve` y el `reject`
+
+* el **`resolve`**: es una funcion que va a tener el valor producto de la promesa
+* el **`reject`** significa que no se logro la promesa
+
+### Optimizacion de Promesas
+
+```js
+return new Promise((res, rej) =>{  });
+```
+> En vez de crear una constante y luego retornar esa constante, se retorna de una vez la promesa de una vez
+
+### Llamar a una promesa
+
+```js
+export const promiseComponent = ( element ) =>{
+
+    const renderHero = ( hero ) =>{
+        element.innerHTML = hero.name
+    }
+    const renderError = ( error ) =>{
+        element.innerHTML = error;
+    }
+    const id1 = '5d86371f25a058e5b1c8a65e'
+    findHero(id1)
+        .then( superHero => renderHero(superHero) )
+        .catch( error => renderError( error ))
+};
+```
+> el argumento `superHero` puede tener cualquier nombre, en este caso, tiene el valor del arreglo que obtuvimos con la promesa
+
+* **`.then()`**: Se ejecuta cuando la promesa se cumple exitosamente. Es donde escribes el código que debería ejecutarse con el resultado positivo.
+* **`.catch()`**: Se ejecuta si la promesa falla. Sirve para manejar errores o situaciones inesperadas.
+
+
+#### **Protip**
+```js
+.then( superHero => renderHero(superHero)
+.then(renderHero) // Es lo mismo
+
+.catch( error => renderError( error ))
+.catch(renderError) // Es lo mismo
+```
+Cuando se tiene el mismo orden de argumentos y misma cantidad de argumentos, se puede aplicar esta sintaxis, solamente mandando la funcion como referencia, automaticamente los argumentos se mandaran en el mismo orden
+
+### Promise Hell
+
+```js
+export const promiseComponent = ( element ) =>{
+    const renderTwoHeros = (hero1, hero2) =>{
+        element.innerHTML = `
+        ${hero1.name} ${hero2.name}
+        `
+    }
+    const renderError = ( error ) =>{
+        element.innerHTML = error;
+    }
+    const id1 = '5d86371f25a058e5b1c8a65e';
+    const id2 = '5d86371f25a058e5b1c8a65e';
+    findHero(id1)
+        .then( (hero1) =>{
+            findHero(id2)
+                .then(  (hero2) =>{
+                    renderTwoHeros(hero1, hero2)
+                } )
+                .catch( error => renderError( error ))
+        })
+        .catch( error => renderError( error ))
+}
+```
+
+### Refactorizacion del Promise Hell
+```js
+let hero1, hero2;
+
+findHero(id1)
+  .then( hero => {
+    hero1 = hero;
+    return findHero(id2)
+      .then( hero2 => {
+        renderTwoHeros( hero1, hero2)
+      })
+  })
+  .catch( renderError)
+
+```
+
+### Promises - All
+
+Nos permite ejecutar todas las promesas que nosotros definamos en un arreglo de Promesas
+
+>Solo aplicable en caso de que las diferentes promesas no dependan entre si 
+
+```js
+Promise.all([
+        findHero(id1),
+        findHero(id2), 
+    ])
+    .then( ([hero1, hero2]) => renderTwoHeros(hero1, hero2))
+    .catch( renderError )
+```
+
+### Promise - Race
+
+Sintaxis similar al `Promise.all` pero esta vez solo devuelve la promesa que se ejecute mas rapida
+
+```js
+Promise.race([
+        slowPromise(),
+        mediumPromise(),
+        fastPromise(),
+    ]).then( renderValue )
+```
