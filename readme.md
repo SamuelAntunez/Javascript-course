@@ -717,3 +717,204 @@ Promise.race([
         fastPromise(),
     ]).then( renderValue )
 ```
+
+## Async
+
+Las funciones asyncronas, no siguen el hilo principal del programa, trabaja en base a referencias 
+```js
+const findHero = async(id) =>{
+
+    const hero = heroes.find( hero => hero.id === id)
+    return hero;
+};
+```
+Una funcion marcada con Async, siempre devolvera una promesa aunque no este especificada
+
+```js
+findHero( id1 )
+        .then( hero => element.innerHTML = hero.name)
+```
+
+#### Manejo de errores en Async
+
+Como el return en una funcion asyncrona solo ocurre cuando el valor es correcto, utilizamos un `throw` para enviar el error
+
+```js
+const findHero = async(id) =>{
+
+    const hero = heroes.find( hero => hero.id === id)
+    if( !hero ) throw `Hero not found`
+    return hero;
+};
+```
+
+## Async-Await
+
+
+```js
+export const asyncAwaitComponent = async( element ) =>{
+    const id1 = '5d86371f2343e37870b91ef1';
+    const id2 = '5d86371f2343e37870b91ef1';
+
+    const hero1 = await findHero(id1);
+    const hero2 = await findHero(id2)
+
+    element.innerHTML = ` ${hero1} / ${hero2}`
+}
+```
+
+* **`async`**: Convierte automáticamente una función en una que devuelve una promesa.
+* **`await`**: Espera a que una promesa se resuelva antes de continuar con la ejecución del código, sin bloquear el hilo principal.
+
+### Desestructuracion del ejercicio
+```js
+export const asyncAwaitComponent = async( element ) =>{
+    const id1 = '5d86371f2343e37870b91ef1';
+    const id2 = '5d86371f2343e37870b91ef1';
+
+    const {name: name1} = await findHero(id1);
+    const {name: name2} = await findHero(id2)
+
+    element.innerHTML = ` ${name1} / ${name2}`
+}
+```
+
+>Al ser promesas que se ejecutan secuencialmente, siempre esperara a que se ejecute la primera para ejecutar la siguiente, solo usar cuando el resultado de una promesa depende de las anteriores
+
+#### Manejo de errores en Async-Await
+
+Para manejar errores utilizamos el `try` y el `catch`
+
+```js
+try {
+        const {name: name1} = await findHero(id1);
+        const {name: name2} = await findHero(id2)
+
+        element.innerHTML = ` ${name1} / ${name2}`
+    } catch (error) {
+        element.innerHTML = error
+    }
+```
+El `error` que agarre sera el primer error que pase por la funcion
+
+## Optimizacion promesas no secuenciales
+
+Utilizando el `Promise.All` podemos trabajar con promesas no secuenciales, y mejorar el tiempo
+```js
+const [value1, value2, value3] = await Promise.all([
+  slowPromise(),
+  mediumPromise(),
+  fastPromise(),
+])
+```
+
+Utilizando la desestructuracion para dar el valor a cada promesa
+>Solo utilizar en promesas que sean independientes unas de otras y puedan utilizarse de manera simultanea
+
+## if Await
+
+Es posible trabajar con el `await` con estructuras de control
+
+```js
+if (await getHeroAsync(id) ){
+  element.innerHTML = hero.name;
+  return
+}
+  element.innerHTML = 'No existe'
+```
+
+## for await
+
+En el caso de tener un arreglo de promesas, podemos recorrer ese arreglo de promesas con el `for await()`
+
+```js
+const heroIds = heroes.map ( hero => hero.id)
+const heroPromises = getHeroesAsync( heroIds)
+for await( const hero of heroPromises) {
+    element.innerHTML += `${hero.name} `
+}
+```
+
+## Funciones Generadoras
+
+La palabra clave `function*` define una funcion generadora
+
+```js
+export const generatorFunctionComponents = ( element ) =>{
+
+    const myGneerator = myFirstGeneratorFunction();
+    console.log( myGneerator.next()); // nos da un objeto con el primer valor
+    console.log( myGneerator.next()); 
+    console.log( myGneerator.next()); 
+    console.log( myGneerator.next()); 
+    console.log( myGneerator.next()); 
+}
+
+function* myFirstGeneratorFunction(){
+    yield 'Primer valor'
+    yield 'Segundo valor'
+    yield 'Tercer valor'
+    yield 'Cuarto valor'
+    return 'no hay mas valores';
+}
+
+```
+Son funciones de las que se puede salir y volver a entrar, de manera incrementar, no ejecuta su cuerpo inmediatamente, puede pausarse y volver a reanudarse cada vez que lo pida
+
+* **`yield`**: la palabra clave yield se usa para pausar y reanudar una funcion generadora
+* **`next()`**: con el metodo `next` te permite avanzar hacia el siguiente `yield`, sucesivamente hasta el return 
+
+Cada yield devolvera un objeto con dos valores `value` y `done`, donde value sera el valor del objeto y done, dependera de si la funcion generadora seguira funcionando o no, cuando `done: true` significa que ya no dara mas valores la funcion generadora
+
+```console
+{value: 'Primer valor', done: false}
+{value: 'Segundo valor', done: false}
+{value: 'Tercer valor', done: false}
+{value: 'Cuarto valor', done: false}
+{value: 'no hay mas valores', done: true}
+```
+
+### Ejemplo de funcion generadora
+```js
+export const generatorFunctionComponents = ( element ) =>{
+  const genId = idGenerator();
+  console.log(genId.next())
+}
+function* idGenerator(){
+  let currentId= 0;
+  while(true) {
+    yield ++currentId
+}
+```
+
+Generador de id utilizando funciones generadoras
+
+## Funciones Generadoras Asincronas
+
+```js
+export const generatorsAsyncComponent = async( element ) =>{
+
+    const heroGenerator = getHeroGenerator();
+    let isFinished = false;
+    do {
+        const { value, done } = await heroGenerator.next()
+        isFinished = done
+        if (isFinished) break;
+        element.innerHTML = value
+    } while (!isFinished);
+
+}
+async function* getHeroGenerator() {
+    for (const hero of heroes ){
+        await sleep();
+        yield hero.name;
+    }
+}
+const sleep = () =>{
+    return new Promise((resolve) =>{
+        setTimeout(()=>{
+            resolve()
+        }, 1000)
+    })
+}
+```
