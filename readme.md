@@ -2,6 +2,7 @@
 
 **ES6 (ECMAScript6)** Es el estándar técnico que define cómo debe funcionar JavaScript. 
 
+## trabajar con directorios cap 161
 ## Trabajar con VITE
 
 En la consola ubicado en la carpeta del proyecto
@@ -277,6 +278,9 @@ const parrafo = document.createElement("p");
 parrafo.innerText = "Este párrafo fue creado dinámicamente";
 document.body.appendChild(parrafo);
  ```
+
+* **`document.replaceChildren()`**: Se usa para reemplazar todos los hijos de un nodo del DOM con uno o más nuevos nodos o cadenas de texto. Es una forma muy práctica de limpiar un elemento y agregarle nuevo contenido sin tener que eliminar manualmente cada hijo.
+
 > Cuando manipulamos el DOM con document. Javascript hace una llamada al documento HTML  y lo recorre cada vez, es recomendable guardarlo en una variable para ahorrar recursos
 
 * **`element.setAttribute()`**: añade o actualiza un atributo del elemento HTML seleccionado.
@@ -918,3 +922,97 @@ const sleep = () =>{
     })
 }
 ```
+
+## Que es una API
+**API significa “interfaz de programación de aplicaciones”.**
+
+Las API son mecanismos que permiten a dos componentes de software comunicarse entre sí mediante un conjunto de definiciones y protocolos. Por ejemplo, el sistema de software del instituto de meteorología contiene datos meteorológicos diarios. La aplicación meteorológica de su teléfono “habla” con este sistema a través de las API y le muestra las actualizaciones meteorológicas diarias en su teléfono.
+
+## Peticiones HTTP
+Una **peticion http** es la forma en que tu navegador se comunica con un servidor web cuando quieres acceder a una página o recurso en internet
+Cuando se hace una peticion Get a una API te devuelve un arreglo con JSON
+
+```
+[
+    {
+        "quote": "Congratulations, you’ve just left your family a second-hand Subaru.",
+        "author": "Saul Goodman"
+    }
+]
+```
+
+### Fetch
+
+Metodo del objeto global windows, Se utiliza para hacer solicitudes HTTP desde el navegador (o desde entornos como Node.js con algunos ajustes). Es una forma moderna de obtener datos de un servidor, ya sea para traer información, enviar datos o interactuar con una API.
+```js
+fetch('https://api.ejemplo.com/datos')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+```
+tambien se puede utilizar de la siguiente manera
+```js
+const fetchQuote = async( ) =>{
+    const res = await fetch('https://api.breakingbadquotes.xyz/v1/quotes')
+    const data = await res.json()
+
+    console.log(data[0])
+    return data[0]
+}
+
+```
+***
+### Trabajo en Postman - Peticion Get
+Es una solicitud que se utiliza para obtener datos desde un servidor web, generalmente a través de una API. Es uno de los métodos HTTP más comunes y no modifica la información del servidor, solo la consulta.
+
+### Trabajo en Postman - Peticion Post
+es un tipo de solicitud HTTP que se utiliza para enviar datos al servidor, generalmente para crear o modificar recursos. A diferencia de una petición GET, los datos no se envían en la URL, sino en el cuerpo de la solicitud, lo que permite mayor seguridad y capacidad.
+
+### Trabajo en Postman - Peticion Put
+se utiliza para actualizar completamente un recurso existente o crear uno nuevo si no existe. A diferencia de POST, que suele usarse para crear, PUT reemplaza el recurso en su totalidad con los datos enviados.
+
+### Trabajo en Postman - Peticion Patch
+se utiliza para modificar parcialmente un recurso existente en el servidor. A diferencia de PUT, que reemplaza todo el recurso, PATCH solo actualiza los campos que especifiques.
+
+### Trabajo en Postman - Peticion Delete
+Sirve para eliminar un recurso
+***
+
+### CRUD ( CREATE, READ, UPDATE, DELETE)
+
+#### Libreria json-server 
+Es una herramienta súper útil cuando estás desarrollando aplicaciones web y necesitas simular un backend rápido sin escribir código del lado del servidor.
+
+* Instalas el paquete
+
+```console
+npm install json-server
+```
+
+* Creas un archivo llamado db.json con datos de ejemplo:
+```console
+{
+  "users": [
+    { "id": 1, "nombre": "Ana" },
+    { "id": 2, "nombre": "Luis" }
+  ]
+}
+```
+* le estableces un arranque en el `package.json` y un puerto unico
+```console
+"server": "json-server ./server/db.json --port 3001"
+```
+* lo ejecutas
+```console
+npm run server
+```
+
+> Para hacer una peticion en postman http://localhost:3001/users/1 donde el **1** indica el ID del USER de la db, si no encuentra ningun usuario, da **404**
+
+
+
+
+
+
+
+
