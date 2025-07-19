@@ -188,6 +188,43 @@ do {
 
 > Esto es útil cuando quieres asegurarte de que cierto código se ejecute por lo menos una vez, como mostrar menús interactivos o recibir input del usuario.
 
+## Control de Flujo
+
+### Break
+* **`break`** Se utiliza para interrumpir la ejecución de un bucle o una sentencia
+
+```js
+for (let i = 0; i < 10; i++) {
+  if (i === 5) {
+    break; // Detiene el bucle cuando i es 5
+  }
+  console.log(i);
+}
+// Salida: 0, 1, 2, 3, 4
+
+```
+* **`return`** Se usa para finalizar la ejecución de una función y devolver un valor 
+```js
+function obtenerParidad(numero) {
+  if (numero % 2 === 0) {
+    return "Par"; // Devuelve "Par" si es divisible por 2
+  }
+  return "Impar"; // Si no, devuelve "Impar"
+}
+
+console.log(obtenerParidad(7)); // Salida: Impar
+```
+* **`continue`** Se utiliza para omitir la iteración actual de un bucle y pasar a la siguiente iteración
+```js
+for (let i = 0; i < 5; i++) {
+  if (i === 2) {
+    continue; // Salta la iteración cuando i es 2
+  }
+  console.log(i);
+}
+// Salida: 0, 1, 3, 4
+```
+
 ## Funciones
 es un bloque de código reutilizable que se ejecuta cuando lo llamas.
 
@@ -294,6 +331,7 @@ parrafo.setAttribute("class", "mensaje");
 ```
 
 * **`element.classList.add()`**: te permite agregar una o más clases CSS a un elemento del DOM sin reemplazar las que ya tiene.
+* **`element.classList.remove()`**: te permite eliminar una o más clases CSS a un elemento del DOM sin reemplazar las que ya tiene.
 
 ```js
 const caja = document.getElementById("caja");
@@ -315,6 +353,12 @@ const boton = document.getElementById("boton");
 boton.addEventListener("click", () => {
   alert("¡Botón clickeado!");
 });
+```
+
+```js
+  form.addEventListener('submit', (e) =>{
+        e.preventDefault()
+  }) // Sirve para prevenir la accion predeterminada del submit de refrescar la pagina
 ```
 
 #### Diferentes tipos de eventos
@@ -1008,6 +1052,9 @@ npm run server
 ```
 
 > Para hacer una peticion en postman http://localhost:3001/users/1 donde el **1** indica el ID del USER de la db, si no encuentra ningun usuario, da **404**
+
+### Mappers
+
 
 
 
