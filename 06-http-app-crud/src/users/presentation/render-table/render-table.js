@@ -1,4 +1,6 @@
 import usersStore from '../../store/users-store';
+import { deleteUserByID } from '../../use-cases/delete-user-by-id';
+import { showModal } from '../render-modal/render-modal';
 import './render-table.css';
 
 let table;
@@ -24,6 +26,30 @@ const createTable = ( ) =>{
     return table
 }
 
+const tableSelectListener = ( e ) =>{
+    const element = e.target.closest('.select-user');
+    if (!element) return
+    const id = element.getAttribute('data-id')
+    showModal(id)
+
+}
+const tableDeleteListener = async( e ) =>{
+    const element = e.target.closest('.delete-user');
+    if (!element) return
+    const id = element.getAttribute('data-id')
+    try {
+        await deleteUserByID(id);
+        await usersStore.reloadPage();
+        document.querySelector('#current-page').innerText = usersStore.getCurrentPage();
+        renderTable()
+    } catch (error) {
+        console.log(error)
+        alert(error)
+    }
+
+
+}
+
 /**
  * 
  * @param {HTMLDivElement} element 
@@ -36,6 +62,9 @@ export const renderTable = ( element ) =>{
         table = createTable();
         element.append( table)
 
+        table.addEventListener('click', tableSelectListener)
+        table.addEventListener('click', tableDeleteListener)
+        
         // TODO Listeners
     }
 
@@ -49,9 +78,9 @@ export const renderTable = ( element ) =>{
             <td>${user.lastName}</th>
             <td>${user.isActive}</th>
             <td>
-                <a href='#' data-id=${user.id}> select</a>
+                <a href='#' class="select-user" data-id=${user.id}> Select</a>
                 |
-                <a href='#' data-id=${user.id}> select</a>
+                <a href='#' class="delete-user" data-id=${user.id}> Delete</a>
 
             
             </th>
